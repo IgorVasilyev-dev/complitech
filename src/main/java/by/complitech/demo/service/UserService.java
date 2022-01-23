@@ -3,6 +3,7 @@ package by.complitech.demo.service;
 import by.complitech.demo.dto.AuthUser;
 import by.complitech.demo.dto.CreateUserRequest;
 import by.complitech.demo.dto.JwtToken;
+import by.complitech.demo.dto.UserLogView;
 import by.complitech.demo.model.User;
 import by.complitech.demo.service.mailService.api.IMailService;
 import by.complitech.demo.storage.api.IUserRepository;
@@ -11,6 +12,7 @@ import by.complitech.demo.util.passwordGenerate.api.IPasswordGenerateUtil;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
+import java.util.List;
 
 public class UserService {
 
@@ -18,16 +20,19 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final IMailService mailService;
     private final IPasswordGenerateUtil passwordGenerateUtil;
+    private final UserLogService userLoginNotificationService;
 
-    public UserService(IUserRepository userRepository, JwtUtil jwtUtil, IMailService mailService, IPasswordGenerateUtil passwordGenerateUtil) {
+    public UserService(IUserRepository userRepository, JwtUtil jwtUtil, IMailService mailService,
+                       IPasswordGenerateUtil passwordGenerateUtil, UserLogService userLoginNotificationService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.mailService = mailService;
         this.passwordGenerateUtil = passwordGenerateUtil;
+        this.userLoginNotificationService = userLoginNotificationService;
     }
 
     @Transactional
-    public User create(CreateUserRequest request) {
+    public void create(CreateUserRequest request) {
         if (userRepository.findByLogin(request.getLogin()).isPresent()) {
             throw new ValidationException("Username exists!");
         }
@@ -38,7 +43,6 @@ public class UserService {
         user.setFullName(request.getFullName());
         user.setPassword(passwordGenerateUtil.generatePassword());
         mailService.sendRegistrationMail(userRepository.save(user));
-        return user;
     }
 
     public JwtToken logIn(AuthUser request) {
@@ -48,7 +52,7 @@ public class UserService {
         if(!user.getPassword().equals(request.getPassword())) {
             throw new ValidationException("invalid password or login");
         }
-        System.out.println("logIn");
+        userLoginNotificationService.logIn(user);
         return new JwtToken(jwtUtil.generateAccessToken(user));
     }
 
@@ -57,7 +61,17 @@ public class UserService {
             Long userId = Long.valueOf(jwtUtil.getUserId(jwtToken));
             User user = userRepository.findById(userId).orElseThrow(
                     () -> new ValidationException("invalid jwtToken"));
+            userLoginNotificationService.logOut(user);
         }
     }
+
+    public List<UserLogView> getUserLogList() {
+        return this.userLoginNotificationService.getList();
+    }
+
+    public void clearUserLogList() {
+        this.userLoginNotificationService.clearList();
+    }
+
 
 }
