@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+jwt:
+  issuer: demo.complitech.by
+  secret: cfv223WEDr_vfhSFBG_w3t22
+  jwtExpirationMs: 1800000
+  jwtRefreshExpirationMs: 172800000
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          aut: true
+          starttls:
+            enable: true
+
+  datasource:
+    driver-class-name: org.hsqldb.jdbcDriver
+    url: jdbc:hsqldb:mem:test;sql.syntax_pgs=true;
+    username: sa
+    password:
+
+  jpa:
+    generate-ddl: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.HSQLDialect
+        hbm2ddl: create-drop
