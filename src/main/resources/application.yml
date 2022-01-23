@@ -4,14 +4,15 @@ server:
 jwt:
   issuer: demo.complitech.by
   secret: cfv223WEDr_vfhSFBG_w3t22
-  expirationDays: 1
+  jwtExpirationMs: 1800000
+  jwtRefreshExpirationMs: 172800000
 
 spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: enter username
-    password: enter password
+    username: test
+    password: test
     properties:
       mail:
         smtp:
@@ -20,14 +21,18 @@ spring:
             enable: true
 
   datasource:
-    driver-class-name: org.hsqldb.jdbcDriver
-    url: jdbc:hsqldb:mem:test;sql.syntax_pgs=true;
-    username: sa
-    password:
-
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/demodb
+    username: postgres
+    password: postgres
+    hikari:
+      minimum-idle: 5
+      auto-commit: false
+      maximum-pool-size: 20
   jpa:
-    generate-ddl: true
+    generate-ddl: false
+    show_sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.HSQLDialect
-        hbm2ddl: create-drop
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        hbm2ddl: none
