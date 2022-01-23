@@ -1,8 +1,13 @@
 package by.complitech.demo.util.jwt.api;
 
+
+import by.complitech.demo.model.RefreshToken;
+
 import java.util.Date;
 
 public interface IJwtUtil<T> {
+
+    RefreshToken generateRefreshToken(T t);
 
     String generateAccessToken(T t);
 

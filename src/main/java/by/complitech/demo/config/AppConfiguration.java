@@ -1,11 +1,14 @@
 package by.complitech.demo.config;
 
+import by.complitech.demo.model.User;
+import by.complitech.demo.service.UserTokenService;
 import by.complitech.demo.service.UserLogService;
 import by.complitech.demo.service.UserService;
 import by.complitech.demo.service.mailService.GmailService;
 import by.complitech.demo.service.mailService.api.IMailService;
+import by.complitech.demo.storage.api.IRefreshTokenRepository;
 import by.complitech.demo.storage.api.IUserRepository;
-import by.complitech.demo.util.jwt.JwtUtil;
+import by.complitech.demo.util.jwt.api.IJwtUtil;
 import by.complitech.demo.util.passwordGenerate.DefaultPasswordGenerateUtil;
 import by.complitech.demo.util.passwordGenerate.api.IPasswordGenerateUtil;
 import org.springframework.context.annotation.Bean;
@@ -18,9 +21,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 public class AppConfiguration {
 
     @Bean
-    UserService userService(IUserRepository repository, JwtUtil jwtUtil, IMailService mailService,
-                            IPasswordGenerateUtil passwordGenerateUtil, UserLogService userLoginNotificationService) {
-        return new UserService(repository, jwtUtil, mailService, passwordGenerateUtil, userLoginNotificationService);
+    UserService userService(IUserRepository repository, IMailService mailService,
+                            IPasswordGenerateUtil passwordGenerateUtil,
+                            UserLogService userLoginNotificationService,
+                            UserTokenService userTokenService) {
+        return new UserService(repository, mailService, passwordGenerateUtil, userLoginNotificationService, userTokenService);
     }
 
     @Bean
@@ -36,6 +41,11 @@ public class AppConfiguration {
     @Bean
     IPasswordGenerateUtil passwordGenerateUtil() {
         return new DefaultPasswordGenerateUtil(16);
+    }
+
+    @Bean
+    UserTokenService refreshTokenService(IJwtUtil<User> jwtUtil, IRefreshTokenRepository refreshTokenRepository) {
+        return new UserTokenService(jwtUtil,refreshTokenRepository);
     }
 
 }
