@@ -1,6 +1,6 @@
 package by.complitech.demo.controller.rest;
 
-import by.complitech.demo.service.UserService;
+import by.complitech.demo.service.userService.api.IUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/log")
 public class UserLogRestServlet {
 
-    private final UserService userService;
+    private final IUserService userService;
 
-    public UserLogRestServlet(UserService userService) {
+    public UserLogRestServlet(IUserService userService) {
         this.userService = userService;
     }
 

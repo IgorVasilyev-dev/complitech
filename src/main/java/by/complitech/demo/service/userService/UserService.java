@@ -1,9 +1,12 @@
-package by.complitech.demo.service;
+package by.complitech.demo.service.userService;
 
 import by.complitech.demo.dto.*;
 import by.complitech.demo.model.RefreshToken;
 import by.complitech.demo.model.User;
 import by.complitech.demo.service.mailService.api.IMailService;
+import by.complitech.demo.service.userService.api.IUserLogService;
+import by.complitech.demo.service.userService.api.IUserService;
+import by.complitech.demo.service.userService.api.IUserTokenService;
 import by.complitech.demo.storage.api.IUserRepository;
 import by.complitech.demo.util.passwordGenerate.api.IPasswordGenerateUtil;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,17 +17,17 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-public class UserService {
+public class UserService implements IUserService {
 
     private final IUserRepository userRepository;
     private final IMailService mailService;
     private final IPasswordGenerateUtil passwordGenerateUtil;
-    private final UserLogService userLoginNotificationService;
-    private final UserTokenService userTokenService;
+    private final IUserLogService userLoginNotificationService;
+    private final IUserTokenService userTokenService;
 
     public UserService(IUserRepository userRepository, IMailService mailService,
                        IPasswordGenerateUtil passwordGenerateUtil,
-                       UserLogService userLoginNotificationService, UserTokenService userTokenService) {
+                       IUserLogService userLoginNotificationService, IUserTokenService userTokenService) {
         this.userRepository = userRepository;
         this.mailService = mailService;
         this.passwordGenerateUtil = passwordGenerateUtil;
@@ -32,6 +35,7 @@ public class UserService {
         this.userTokenService = userTokenService;
     }
 
+    @Override
     @Transactional
     public void create(CreateUserRequest request) {
         if (userRepository.findByLogin(request.getLogin()).isPresent()) {
@@ -46,6 +50,7 @@ public class UserService {
         mailService.sendRegistrationMail(userRepository.save(user));
     }
 
+    @Override
     public TokenRefreshResponse logIn(AuthUser request) {
         User user = userRepository.findByLogin(request.getLogin()).orElseThrow(
                 () -> new ValidationException("invalid password or login")
@@ -58,6 +63,7 @@ public class UserService {
         return new TokenRefreshResponse(userTokenService.generateAccessToken(user), refreshToken.getToken());
     }
 
+    @Override
     public void logOut(String jwtToken) {
         if(!userTokenService.validate(jwtToken)) {
             throw new ValidationException("invalid jwtToken");
@@ -69,6 +75,7 @@ public class UserService {
         userLoginNotificationService.logOut(user);
     }
 
+    @Override
     public TokenRefreshResponse refreshJwtToken(TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
         return userTokenService.findByToken(requestRefreshToken)
@@ -81,10 +88,12 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
     }
 
+    @Override
     public List<UserLogView> getUserLogList() {
         return this.userLoginNotificationService.getList();
     }
 
+    @Override
     public void clearUserLogList() {
         this.userLoginNotificationService.clearList();
     }

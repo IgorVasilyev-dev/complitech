@@ -1,11 +1,14 @@
 package by.complitech.demo.config;
 
 import by.complitech.demo.model.User;
-import by.complitech.demo.service.UserTokenService;
-import by.complitech.demo.service.UserLogService;
-import by.complitech.demo.service.UserService;
+import by.complitech.demo.service.userService.UserTokenService;
+import by.complitech.demo.service.userService.UserLogService;
+import by.complitech.demo.service.userService.UserService;
 import by.complitech.demo.service.mailService.GmailService;
 import by.complitech.demo.service.mailService.api.IMailService;
+import by.complitech.demo.service.userService.api.IUserLogService;
+import by.complitech.demo.service.userService.api.IUserService;
+import by.complitech.demo.service.userService.api.IUserTokenService;
 import by.complitech.demo.storage.api.IRefreshTokenRepository;
 import by.complitech.demo.storage.api.IUserRepository;
 import by.complitech.demo.util.jwt.api.IJwtUtil;
@@ -21,15 +24,15 @@ import org.springframework.mail.javamail.JavaMailSender;
 public class AppConfiguration {
 
     @Bean
-    UserService userService(IUserRepository repository, IMailService mailService,
-                            IPasswordGenerateUtil passwordGenerateUtil,
-                            UserLogService userLoginNotificationService,
-                            UserTokenService userTokenService) {
+    IUserService userService(IUserRepository repository, IMailService mailService,
+                             IPasswordGenerateUtil passwordGenerateUtil,
+                             IUserLogService userLoginNotificationService,
+                             IUserTokenService userTokenService) {
         return new UserService(repository, mailService, passwordGenerateUtil, userLoginNotificationService, userTokenService);
     }
 
     @Bean
-    UserLogService userLoginNotificationService() {
+    IUserLogService userLoginNotificationService() {
         return new UserLogService();
     }
 
@@ -44,7 +47,7 @@ public class AppConfiguration {
     }
 
     @Bean
-    UserTokenService refreshTokenService(IJwtUtil<User> jwtUtil, IRefreshTokenRepository refreshTokenRepository) {
+    IUserTokenService refreshTokenService(IJwtUtil<User> jwtUtil, IRefreshTokenRepository refreshTokenRepository) {
         return new UserTokenService(jwtUtil,refreshTokenRepository);
     }
 

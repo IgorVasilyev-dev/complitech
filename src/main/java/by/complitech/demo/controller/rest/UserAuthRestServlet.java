@@ -3,7 +3,7 @@ package by.complitech.demo.controller.rest;
 import by.complitech.demo.dto.AuthUser;
 import by.complitech.demo.dto.CreateUserRequest;
 import by.complitech.demo.dto.TokenRefreshRequest;
-import by.complitech.demo.service.UserService;
+import by.complitech.demo.service.userService.api.IUserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +15,9 @@ import javax.validation.Valid;
 @RequestMapping(value = "/user/auth")
 public class UserAuthRestServlet {
 
-    private final UserService userService;
+    private final IUserService userService;
 
-    public UserAuthRestServlet(UserService userService) {
+    public UserAuthRestServlet(IUserService userService) {
         this.userService = userService;
     }
 

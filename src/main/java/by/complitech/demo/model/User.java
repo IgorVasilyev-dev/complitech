@@ -10,7 +10,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@Table(name = "users")
+@Table(name = "users", indexes = @Index(name = "login_index", columnList = "login"))
 public class User implements Serializable {
 
     @Id
